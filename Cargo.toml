@@ -4,4 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ethers = { version = "2.0.11", features = ["abigen-online", "abigen"] }
+anyhow = "1.0.75"
+async-trait = "0.1.74"
+ethers = { version = "2.0.11" }
+
+[build-dependencies]
+ethers = { version = "2.0.11", features = ["abigen-online"] }
