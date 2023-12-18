@@ -1,4 +1,4 @@
 tab_spaces = 2
 max_width = 80
-imports_granularity = "Module"
+imports_granularity = "Crate"
 format_strings = true
