@@ -1,11 +1,12 @@
-use async_trait::async_trait;
-use ethers::prelude::abigen;
-use ethers::prelude::types::U256;
-use ethers::providers::Middleware;
 use anyhow::Error;
-use ethers::prelude::{Address, EthEvent};
+use async_trait::async_trait;
+use ethers::{
+  prelude::{abigen, types::U256, Address},
+  providers::Middleware,
+};
+use serde_json::to_string;
 
-use crate::Stakeable;
+use crate::{ffi::TransactionJson, StakingTransactions};
 
 pub struct XEN(U256);
 pub struct Days(U256);
@@ -16,20 +17,20 @@ abigen!(
 );
 
 #[async_trait]
-impl<M: Middleware> Stakeable for XenContract<M> {
+impl<M: Middleware> StakingTransactions for XenContract<M> {
   type Token = XEN;
   type TermUnits = Days;
-  type Err = Error;
-  async fn stake<Out: EthEvent>(
+  fn stake(
     &self,
     address: Address,
     amount: Self::Token,
     term: Self::TermUnits,
-  ) -> Result<Out, Self::Err> {
-    let receipt = self.stake(amount.0, term.0).await;
-    // TODO: Don't execute here, return transaction instead
+  ) -> Result<TransactionJson, Error> {
+    let json = to_string(&self.stake(amount.0, term.0).from(address).tx)?;
+    Ok(TransactionJson { json })
   }
-  async fn withdraw<Out: EthEvent>(&self, address: Address) -> Result<Out, Self::Err> {
-    unimplemented!();
+  fn withdraw(&self, address: Address) -> Result<TransactionJson, Error> {
+    let json = to_string(&self.withdraw().from(address).tx)?;
+    Ok(TransactionJson { json })
   }
 }
